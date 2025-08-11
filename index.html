@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sistem Kepustakawanan</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="container">
+  <div id="loginBox" class="card">
+    <h2>Login Petugas</h2>
+    <input id="user" placeholder="Username" />
+    <input id="pass" type="password" placeholder="Password" />
+    <div class="row"><button id="btnLogin">Login</button></div>
+    <p class="muted">Default: <code>admin</code> / <code>123456</code></p>
+    <p id="loginMsg" class="error"></p>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="card header">
+      <h1>Sistem Pengelolaan Kepustakawanan</h1>
+      <div class="actions">
+        <button id="btnLogout">Logout</button>
+        <button id="btnExport">Ekspor CSV</button>
+        <button id="btnImportToggle">Impor CSV</button>
+        <button id="btnPrint">Cetak</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h3>Input Kunjungan</h3>
+        <label>Tanggal: <input type="date" id="visitDate" /></label>
+        <label>Gender:
+          <select id="visitGender"><option>Laki-laki</option><option>Perempuan</option></select>
+        </label>
+        <label>Pekerjaan:
+          <select id="visitJob">
+            <option>SD</option><option>SLTP</option><option>SLTA</option><option>MAHASISWA/I</option>
+            <option>ASN</option><option>GURU</option><option>TNI/POLRI</option><option>SWASTA</option><option>UMUM</option>
+          </select>
+        </label>
+        <label>Jumlah: <input type="number" id="visitCount" min="1" value="1" /></label>
+        <div><button id="addVisit">Tambah Kunjungan</button></div>
+      </section>
+
+      <section class="card">
+        <h3>Input Peminjaman / Pengembalian</h3>
+        <label>Tanggal: <input type="date" id="txDate" /></label>
+        <label>Jenis:
+          <select id="txType"><option>Peminjaman</option><option>Pengembalian</option></select>
+        </label>
+        <label>Klasifikasi:
+          <select id="txClass"><option>000</option><option>100</option><option>200</option><option>300</option><option>400</option><option>500</option><option>600</option><option>700</option><option>800</option><option>900</option></select>
+        </label>
+        <label>Jumlah: <input type="number" id="txCount" min="1" value="1" /></label>
+        <div><button id="addTx">Tambah Transaksi</button></div>
+      </section>
+
+      <section class="card">
+        <h3>Filter & Rekap</h3>
+        <label>Filter Tanggal: <input type="date" id="filterDateFrom" /> s/d <input type="date" id="filterDateTo" /></label>
+        <label>Kelompokkan: 
+          <select id="groupBy"><option value="day">Harian</option><option value="week">Mingguan</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select>
+        </label>
+        <div class="row">
+          <button id="applyFilter">Terapkan</button>
+          <button id="clearFilter">Bersihkan</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Rekap Tabel - Kunjungan</h3>
+        <table id="tblVisits"><thead><tr><th>Tanggal</th><th>Gender</th><th>Pekerjaan</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+      </section>
+
+      <section class="card">
+        <h3>Rekap Tabel - Transaksi</h3>
+        <table id="tblTx"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Klasifikasi</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+      </section>
+
+      <section class="card charts">
+        <h3>Grafik</h3>
+        <canvas id="chartVisits" height="120"></canvas>
+        <canvas id="chartTx" height="120"></canvas>
+      </section>
+
+      <input type="file" id="fileImport" accept=".csv" class="hidden" />
+    </main>
+  </div>
+
+  <footer class="muted center">Sistem Kepustakawanan — Offline & Online (localStorage)</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
