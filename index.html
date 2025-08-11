@@ -1,123 +1,99 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Kepustakawanan - Perpustakaan Umum Kota Padang</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- html2pdf (untuk eksport PDF) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sistem Kepustakawanan</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="logo-area">
-        <img src="img/logo_perpus.jpg" alt="Logo Perpustakaan" class="logo">
-        <img src="img/logo_padang.png" alt="Logo Kota Padang" class="logo">
-      </div>
-      <div class="title-area">
-        <h1>Perpustakaan Umum Kota Padang</h1>
-        <p class="subtitle">Dashboard Pengelolaan Kunjungan — Peminjaman — Pengembalian</p>
-      </div>
+<div class="container">
+  <div id="loginBox" class="card">
+    <h2>Login Petugas</h2>
+    <input id="user" placeholder="Username" />
+    <input id="pass" type="password" placeholder="Password" />
+    <div class="row"><button id="btnLogin">Login</button></div>
+    <p class="muted">Default: <code>admin</code> / <code>123456</code></p>
+    <p id="loginMsg" class="error"></p>
+  </div>
 
-      <nav class="nav">
-        <button data-tab="beranda" class="nav-btn active">Beranda</button>
-        <button data-tab="input" class="nav-btn">Input Data</button>
-        <button data-tab="laporan" class="nav-btn">Laporan & Ekspor</button>
-        <button data-tab="pengaturan" class="nav-btn">Pengaturan</button>
-      </nav>
+  <div id="app" class="hidden">
+    <header class="card header">
+      <h1>Sistem Pengelolaan Kepustakawanan</h1>
+      <div class="actions">
+        <button id="btnLogout">Logout</button>
+        <button id="btnExport">Ekspor CSV</button>
+        <button id="btnImportToggle">Impor CSV</button>
+        <button id="btnPrint">Cetak</button>
+      </div>
     </header>
 
     <main>
-      <!-- BERANDA -->
-      <section id="tab-beranda" class="tab-pane active">
-        <div class="card welcome">
-          <h2>Selamat Datang</h2>
-          <p>Gunakan menu <strong>Input Data</strong> untuk menambahkan kunjungan, peminjaman, dan pengembalian. 
-          Data akan tersimpan di browser (LocalStorage) dan dapat diekspor ke CSV / PDF.</p>
-          <img src="img/logo_perpus.jpg" class="big-logo" alt="logo">
+      <section class="card">
+        <h3>Input Kunjungan</h3>
+        <label>Tanggal: <input type="date" id="visitDate" /></label>
+        <label>Gender:
+          <select id="visitGender"><option>Laki-laki</option><option>Perempuan</option></select>
+        </label>
+        <label>Pekerjaan:
+          <select id="visitJob">
+            <option>SD</option><option>SLTP</option><option>SLTA</option><option>MAHASISWA/I</option>
+            <option>ASN</option><option>GURU</option><option>TNI/POLRI</option><option>SWASTA</option><option>UMUM</option>
+          </select>
+        </label>
+        <label>Jumlah: <input type="number" id="visitCount" min="1" value="1" /></label>
+        <div><button id="addVisit">Tambah Kunjungan</button></div>
+      </section>
+
+      <section class="card">
+        <h3>Input Peminjaman / Pengembalian</h3>
+        <label>Tanggal: <input type="date" id="txDate" /></label>
+        <label>Jenis:
+          <select id="txType"><option>Peminjaman</option><option>Pengembalian</option></select>
+        </label>
+        <label>Klasifikasi:
+          <select id="txClass"><option>000</option><option>100</option><option>200</option><option>300</option><option>400</option><option>500</option><option>600</option><option>700</option><option>800</option><option>900</option></select>
+        </label>
+        <label>Jumlah: <input type="number" id="txCount" min="1" value="1" /></label>
+        <div><button id="addTx">Tambah Transaksi</button></div>
+      </section>
+
+      <section class="card">
+        <h3>Filter & Rekap</h3>
+        <label>Filter Tanggal: <input type="date" id="filterDateFrom" /> s/d <input type="date" id="filterDateTo" /></label>
+        <label>Kelompokkan: 
+          <select id="groupBy"><option value="day">Harian</option><option value="week">Mingguan</option><option value="month">Bulanan</option><option value="year">Tahunan</option></select>
+        </label>
+        <div class="row">
+          <button id="applyFilter">Terapkan</button>
+          <button id="clearFilter">Bersihkan</button>
         </div>
       </section>
 
-      <!-- INPUT DATA -->
-      <section id="tab-input" class="tab-pane">
-        <div class="grid">
-          <!-- FORM KUNJUNGAN -->
-          <div class="card">
-            <h3>Input Kunjungan</h3>
-            <label>Tanggal: <input type="date" id="visitDate"></label>
-            <div class="jobs-grid">
-              <div><label>SD <input type="number" id="job_SD" min="0" value="0"></label></div>
-              <div><label>SLTP <input type="number" id="job_SLTP" min="0" value="0"></label></div>
-              <div><label>SLTA <input type="number" id="job_SLTA" min="0" value="0"></label></div>
-              <div><label>MAHASISWA/I <input type="number" id="job_MHS" min="0" value="0"></label></div>
-              <div><label>ASN <input type="number" id="job_ASN" min="0" value="0"></label></div>
-              <div><label>GURU <input type="number" id="job_GURU" min="0" value="0"></label></div>
-              <div><label>TNI/POLRI <input type="number" id="job_TNI" min="0" value="0"></label></div>
-              <div><label>SWASTA <input type="number" id="job_SWASTA" min="0" value="0"></label></div>
-              <div><label>UMUM <input type="number" id="job_UMUM" min="0" value="0"></label></div>
-            </div>
-            <div class="form-actions">
-              <button id="btnAddVisit">Tambah Kunjungan</button>
-              <button id="btnResetVisit" class="danger">Reset Input</button>
-            </div>
-          </div>
-
-          <!-- FORM TRANSAKSI -->
-          <div class="card">
-            <h3>Input Transaksi Buku</h3>
-            <label>Tanggal: <input type="date" id="txDate"></label>
-            <label>Jenis:
-              <select id="txKind">
-                <option value="Peminjaman">Peminjaman</option>
-                <option value="Pengembalian">Pengembalian</option>
-              </select>
-            </label>
-            <label>Klasifikasi:
-              <select id="txClass">
-                <option>000</option><option>100</option><option>200</option><option>300</option><option>400</option>
-                <option>500</option><option>600</option><option>700</option><option>800</option><option>900</option>
-              </select>
-            </label>
-            <label>Jumlah: <input type="number" id="txCount" min="1" value="1"></label>
-            <div class="form-actions">
-              <button id="btnAddTx">Tambah Transaksi</button>
-              <button id="btnResetTx" class="danger">Reset Input</button>
-            </div>
-          </div>
-        </div>
+      <section class="card">
+        <h3>Rekap Tabel - Kunjungan</h3>
+        <table id="tblVisits"><thead><tr><th>Tanggal</th><th>Gender</th><th>Pekerjaan</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody></tbody></table>
       </section>
 
-      <!-- LAPORAN & EKSPOR -->
-      <section id="tab-laporan" class="tab-pane">
-        <div class="card">
-          <h3>Rekap Kunjungan</h3>
-          <div class="controls-row">
-            <button id="btnExportVisitPDF">Ekspor PDF</button>
-          </div>
-          <div id="reportVisitArea" class="report-area">
-            <table id="reportVisitTable"></table>
-            <canvas id="reportVisitChart" height="120"></canvas>
-          </div>
-        </div>
+      <section class="card">
+        <h3>Rekap Tabel - Transaksi</h3>
+        <table id="tblTx"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Klasifikasi</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody></tbody></table>
       </section>
 
-      <!-- PENGATURAN -->
-      <section id="tab-pengaturan" class="tab-pane">
-        <div class="card">
-          <h3>Pengaturan</h3>
-          <button id="btnResetAll" class="danger">Hapus Semua Data</button>
-        </div>
+      <section class="card charts">
+        <h3>Grafik</h3>
+        <canvas id="chartVisits" height="120"></canvas>
+        <canvas id="chartTx" height="120"></canvas>
       </section>
+
+      <input type="file" id="fileImport" accept=".csv" class="hidden" />
     </main>
   </div>
 
-  <!-- JS -->
-  <script src="script.js"></script>
+  <footer class="muted center">Sistem Kepustakawanan — Offline & Online (localStorage)</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
